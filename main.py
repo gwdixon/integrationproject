@@ -25,14 +25,15 @@ name = input("First you have to choose a name")
 print("you have encountered an enemy")
 
 
+# attack function
 def swing(funcplayerhp, funcenemyhp, funclevel, funcdamagemulti,
           funcbasedamage):
     dead = 0
     funcenemyhp = funcenemyhp * funclevel
     while dead == 0:
-        funcenemyhp -= (random.randrange(funcbasedamage, funcbasedamage + 5) \
-                       ** funcdamagemulti) // 1
-        funcplayerhp -= random.randrange(0 + funclevel, 5 + funclevel) *\
+        funcenemyhp -= (random.randrange(funcbasedamage, funcbasedamage + 5)
+                        ** funcdamagemulti) // 1
+        funcplayerhp -= random.randrange(0 + funclevel, 2 + funclevel) * \
                         funclevel
         print("the enemy hp is now", funcenemyhp)
         print(name + "'s hp is now", funcplayerhp)
@@ -44,6 +45,7 @@ def swing(funcplayerhp, funcenemyhp, funclevel, funcdamagemulti,
             return 1
 
 
+# finds if the player won or lost the battle and responds accordingly
 def afterBattle(funcsuccess, funcgold, funclevel):
     if funcsuccess == 1:
         print("Congratulations!")
@@ -60,51 +62,54 @@ def afterBattle(funcsuccess, funcgold, funclevel):
 while attackLoop != 1:
     try:
         attack = int(input("attack it by typing 1"))
-        attackLoop = 1
-        success = swing(playerHP, enemyHP, level, damageMulti, baseDamage)
+        if attack == 1:
+            attackLoop = 1
+            success = swing(playerHP, enemyHP, level, damageMulti, baseDamage)
+            gold = afterBattle(success, gold, level)
+        else:
+            print("please type 1")
+            attackLoop = 0
     except:
         print("please type 1")
         attackLoop = 0
-        attack = int(input("attack it by typing 1"))
 
-gold = afterBattle(success, gold, level)
 print("Congratulations on defeating your first enemy!")
 # this line thinks is sql for some reason
 print("Select the shop from the location menu")
 
 
+# controls the menu for locations
 def locationMenu():
-    for location in range(1, 4):
+    for location in range(1, 5):
         if location == 1:
             locName = "fight"
-        if location == 2:
+        elif location == 2:
             locName = "shop"
-        if location == 3:
+        elif location == 3:
             locName = "minigame"
+        elif location == 4:
+            locName = "Quit Game"
         print(location, ".", locName)
     funcdestination = input("chose the number where you want to go")
     try:
         funcdestination = int(funcdestination)
     except:
         print("Invalid selection. Try again.")
-        locationMenu()
-    if funcdestination > 3:
-        funcdestination = int(funcdestination)
+        return 5
+    if funcdestination > 4:
         print("Invalid selection. Try again.")
-        locationMenu()
+        return 5
     if funcdestination < 1:
-        funcdestination = int(funcdestination)
         print("Invalid selection. Try again.")
-        locationMenu()
+        return 5
     if funcdestination == 1:
-        funcdestination = int(funcdestination)
         return 0
     if funcdestination == 2:
-        funcdestination = int(funcdestination)
         return 1
     if funcdestination == 3:
-        funcdestination = int(funcdestination)
         return 2
+    if funcdestination == 4:
+        return 3
 
 
 def shopMenu(funcupgrade1, funcupgrade2, funcupgrade3, funcgold):
@@ -121,13 +126,13 @@ def shopMenu(funcupgrade1, funcupgrade2, funcupgrade3, funcgold):
         choice = int(choice)
     except:
         print("Invalid selection. Try again.")
-        locationMenu()
+        return 4
     if choice > 4:
         print("Invalid selection. Try again.")
-        locationMenu()
+        return 4
     if choice < 1:
         print("Invalid selection. Try again.")
-        locationMenu()
+        return 4
     if choice == 1:
         if funcgold < funccost1:
             print("you don't have enough gold for that upgrade")
@@ -248,15 +253,16 @@ def miniGame():
             except:
                 print("Invalid selection. Try again.")
 
+    # looping the menus
 
-# looping the menus
+
 shopLoop = 0
 while shopLoop == 0:
     destination = locationMenu()
     if destination == 0:
         shopLoop = 1
         level += 1
-    if destination == 1:
+    elif destination == 1:
         upgrade = shopMenu(upgrade1, upgrade2, upgrade3, gold)
         if upgrade == 0:
             cost = int((200 ** math.log2(upgrade1 * 1.1)) // 1)
@@ -266,13 +272,13 @@ while shopLoop == 0:
             print("Your Base Damage is now", baseDamage)
         elif upgrade == 1:
             cost2 = 75 * (upgrade2 ** 1.002) // 1
-            gold -= cost
+            gold -= cost2
             upgrade2 += 1
             playerHP = playerHP * 2
             print("Your hit points is now", playerHP)
         elif upgrade == 2:
             cost3 = 1000 * (upgrade3 ** 1.001) // 1
-            gold -= cost
+            gold -= cost3
             upgrade3 += 1
             damageMulti += 0.02
             print("Your Damage Multiplier is now", damageMulti)
@@ -281,11 +287,14 @@ while shopLoop == 0:
             placeholder = 0
     if destination == 2:
         miniGame()
+    if destination == 3:
+        print("Thank you for playing")
+        quit()
 
 # the main loop starts here
 mainLoop = 0
 while mainLoop == 0:
-    success = (playerHP, enemyHP, level, damageMulti, baseDamage)
+    success = swing(playerHP, enemyHP, level, damageMulti, baseDamage)
     gold = afterBattle(success, gold, level)
     shopLoop = 0
     while shopLoop == 0:
@@ -318,3 +327,6 @@ while mainLoop == 0:
                 placeholder = 0
         if destination == 2:
             miniGame()
+        if destination == 3:
+            print("Thank you for playing")
+            quit()
